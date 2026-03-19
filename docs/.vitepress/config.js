@@ -25,19 +25,29 @@ const getValidProjectDirs = () => {
 };
 
 // 3. 自动生成导航栏（导航名用「项目名」，链接指向项目首页）
+// 自动生成导航栏（优化为下拉菜单）
 const generateNav = () => {
-  const nav = [{ text: '总首页', link: '/' }]; // 站点总首页
+  const nav = [{ text: '总首页', link: '/' }];
   const projectDirs = getValidProjectDirs();
-  
-  projectDirs.forEach(dir => {
-    // 导航名优化：比如「RAG-project」→「RAG Project」（下划线/短横线转空格，首字母大写）
-    const navText = dir.replace(/[-_]/g, ' ')
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-    nav.push({ text: navText, link: `/${dir}/` }); // 链接指向项目首页路由
-  });
-  
+
+  // 项目少于3个时，直接平铺展示
+  if (projectDirs.length <= 2) {
+    projectDirs.forEach(dir => {
+      const navText = dir.replace(/[-_]/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+      nav.push({ text: navText, link: `/${dir}/` });
+    });
+  } 
+  // 项目多于3个时，收纳到下拉菜单
+  else {
+    nav.push({
+      text: '项目列表',
+      items: projectDirs.map(dir => ({
+        text: dir.replace(/[-_]/g, ' ').split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '),
+        link: `/${dir}/`
+      }))
+    });
+  }
+
   return nav;
 };
 
